@@ -16,5 +16,7 @@ SaveScriptBefore=false
 ## Usage
 
 run from _Tools\User tools\thinSample_ menu
+
 type or paste a keyword in the inputbox
+
 double click a sample name (if any) in the listbox or select it and click the _Modify_ button
