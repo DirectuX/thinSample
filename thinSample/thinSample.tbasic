@@ -1,0 +1,89 @@
+
+#MinVersion 1.11.2
+Uses "UI"
+Uses "OS"
+
+#Resource "thinSample.rc"
+
+#Region "Form1"
+
+DIALOG New units, Name Form1, %HWND_DESKTOP
+
+CallBack Function Form1_OnLoad() As Long
+
+  local hFont as Long
+  hFont = Font_New("", 16)
+  Control set font CBHNDL, Label1.id, hFont
+  Label1.text = "You searched " & $dq & sSearch & $dq
+
+  LISTBOX ADD CBHNDL, listbox1.id, sList USING $crlf
+
+End Function
+
+CallBack Function BTN_QUIT_OnClick() As Long
+  
+  dialog end Form1.Handle ' STOP keyword does not work here
+
+End Function
+
+CallBack Function BTN_MODIFY_OnClick() As Long
+  
+  local tmpstr as String
+  
+  '[] [REF] https://www.thinbasic.com/public/products/thinBasic/help/html/control_gettext.htm
+  '[t] Control_GetText does not work here  
+  'tmpStr = Control_GetText(form1.Handle, listbox1.id) ' This does not work
+  
+  LISTBOX GET TEXT cbHndl, listbox1.iD TO tmpStr
+  
+  OS_ShellExecute("edit", sSamplesPath & tmpStr,"","",%SW_NORMAL)
+  dialog end Form1.Handle
+
+End Function
+
+CallBack Function Form1_OnCallBack() As Long
+  
+  local tmpstr as String
+
+  SELECT CASE cbMsg
+    CASE %WM_COMMAND
+      SELECT CASE cbCtl
+        case listbox1.iD
+          select case cbCtlMsg
+            case %LBN_DBLCLK
+              LISTBOX GET TEXT cbHndl, listbox1.iD TO tmpStr
+              'MsgBox 0, sSamplesPath & tmpStr
+              if len(tmpStr)>7 then
+                OS_ShellExecute("edit", sSamplesPath & tmpStr,"","",%SW_NORMAL)
+                dialog end Form1.Handle
+              endif
+          end select
+      end Select
+  end Select
+End Function
+
+  #EndRegion
+
+Function TBMain() as long
+
+  Global sSearch as String ' string to search in samples
+  Global aFiles() as String ' list of the relevant samples
+  Global sSamplesPath as String ' thinbasic samples main folder
+  Global sList as String ' shell output
+
+  sSamplesPath = APP_Path & "SampleScripts" & "\"
+  sSearch = InputBox$(0,"What keyword to search for ?", "thinSample")
+
+  if len(sSearch) = 0 Then ' user didn't input a string to search or cancelled
+
+    MsgBox 0, "Search cancelled." ,, "Quitting", 1500
+    Stop
+
+  endif
+
+  sList = Shell_CaptureOutput("cmd /c findstr /s /i /m /p /C:" & $DQ & sSearch & $DQ & " *.tbasic", sSamplesPath ,%SW_HIDE,2000)
+  sList = RTrim$(sList,$CRLF)
+  
+  DIALOG SHOW MODAL Form1.Handle
+
+end Function
