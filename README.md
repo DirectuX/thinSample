@@ -1,6 +1,8 @@
 # thinSample
 user tool to help finding all relevant  [thinBasic](https://www.thinbasic.com) samples scripts given a keyword
 
+⮞ [thinSample tread](https://www.thinbasic.com/community/showthread.php?13033-thinSample-at-your-service) with screenshots on thinBasic's community forum.
+
 ## thinAir integration
 
 1. Copy folder _thinSample_ to _%thinBasic_Installation_Folder%\thinAir\Tools\_
