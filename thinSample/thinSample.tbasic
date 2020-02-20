@@ -75,7 +75,22 @@ CallBack Function Form1_OnCallBack() As Long
   end Select
 End Function
 
-  #EndRegion
+#EndRegion
+
+#Region "splash"
+
+DIALOG New units, Name splash, %HWND_DESKTOP
+
+CallBack Function splash_OnLoad() As Long
+
+  local hFont as Long
+  hFont = Font_New("", 16)
+  Control set font CBHNDL, searchinglabel.id, hFont
+  searchinglabel.text = "Searching your scripts, please wait..." 
+
+End Function
+
+#EndRegion
 
 Function TBMain() as long
 
@@ -83,6 +98,9 @@ Function TBMain() as long
   Global aFiles() as String ' list of the relevant samples
   Global sSamplesPath as String ' thinbasic samples main folder
   Global sList as String ' shell output
+  
+  local splashTimer as DWord ' to manage a minimal display time for the splash
+  %MIN_SPLASH_DURATION = 500 ' ms
 
   sSamplesPath = APP_Path & "SampleScripts" & "\"
   sSearch = InputBox$(0,"What keyword to search for ?", "thinSample")
@@ -93,9 +111,15 @@ Function TBMain() as long
     Stop
 
   endif
+  
+  DIALOG SHOW MODeless splash.Handle
+  splashTimer = GetTickCount
 
-  sList = Shell_CaptureOutput("cmd /c findstr /s /i /m /p /C:" & $DQ & sSearch & $DQ & " *.tbasic", sSamplesPath ,%SW_HIDE,4000)
+  sList = Shell_CaptureOutput("cmd /c findstr /s /i /m /p /C:" & $DQ & sSearch & $DQ & " *.tbasic", sSamplesPath ,%SW_HIDE,4000) ' up to 4s
   sList = RTrim$(sList,$CRLF)
+  
+  sleep(%MIN_SPLASH_DURATION + GetTickCount - splashTimer) ' avoid splash flash
+  dialog end splash.Handle
   
   DIALOG SHOW MODAL Form1.Handle
 
@@ -128,3 +152,4 @@ function GetSelectedListboxItems(hDlg as dword, hCtl as long, byref out_result()
     return selectionCount
   end if
 end function
+
