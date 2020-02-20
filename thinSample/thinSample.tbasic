@@ -29,14 +29,27 @@ End Function
 CallBack Function BTN_MODIFY_OnClick() As Long
   
   local tmpstr as String
+  Local selectioncount as DWord
+  Local out_result() as string
   
   '[] [REF] https://www.thinbasic.com/public/products/thinBasic/help/html/control_gettext.htm
   '[t] Control_GetText does not work here  
-  'tmpStr = Control_GetText(form1.Handle, listbox1.id) ' This does not work
+  'tmpStr = Control_GetText(form1.Handle, listbox1.id) ' This does not work  
+  'LISTBOX GET TEXT cbHndl, listbox1.iD TO tmpStr
   
-  LISTBOX GET TEXT cbHndl, listbox1.iD TO tmpStr
+  selectioncount = GetSelectedListboxItems(Form1.Handle, listbox1.id , out_result)
   
-  OS_ShellExecute("edit", sSamplesPath & tmpStr,"","",%SW_NORMAL)
+  if selectioncount < 1 then
+    MsgBox Form1.Handle, "Please, first select at least one script", , "thinSample"
+    Return
+  Else
+    for i as DWord = 1 to selectioncount
+      OS_ShellExecute("edit", sSamplesPath & out_result(i),"","",%SW_NORMAL)
+    next
+  endif
+  
+  'OS_ShellExecute("edit", sSamplesPath & tmpStr,"","",%SW_NORMAL)
+  
   dialog end Form1.Handle
 
 End Function
@@ -81,9 +94,37 @@ Function TBMain() as long
 
   endif
 
-  sList = Shell_CaptureOutput("cmd /c findstr /s /i /m /p /C:" & $DQ & sSearch & $DQ & " *.tbasic", sSamplesPath ,%SW_HIDE,2000)
+  sList = Shell_CaptureOutput("cmd /c findstr /s /i /m /p /C:" & $DQ & sSearch & $DQ & " *.tbasic", sSamplesPath ,%SW_HIDE,4000)
   sList = RTrim$(sList,$CRLF)
   
   DIALOG SHOW MODAL Form1.Handle
 
 end Function
+
+'[][REF] https://www.thinbasic.com/community/showthread.php?13034-ListBox-control-multi-selection&p=95453&viewfull=1#post95453
+function GetSelectedListboxItems(hDlg as dword, hCtl as long, byref out_result() as string) as long
+  Local selectionCount, hList as long
+   
+  control handle hDlg, hCtl to hList
+  selectionCount = SendMessage(hList, %LB_GETSELCOUNT, 0, 0)
+   
+  if selectionCount > 0 then
+    Local itemIndexes(selectionCount) as long
+    SendMessage(hList, %LB_GETSELITEMS, selectionCount, varptr(itemIndexes(1)))
+      
+    ' Fit the output array to selection count
+    redim out_result(selectionCount)
+      
+    ' Limited to 512 characters, feel free to adjust
+    Local singleTextItem as asciiz * 32767
+     
+    ' Extract all items from ListBox
+    for i as long = 1 to selectionCount
+      SendMessage(hList, %LB_GETTEXT, itemIndexes(i), varptr(singleTextItem))
+ 
+      out_result(i) = singleTextItem
+    next
+     
+    return selectionCount
+  end if
+end function
