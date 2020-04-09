@@ -1,3 +1,5 @@
+###### ***Readme last reviewed at ThinBasic v1.11.4.0***
+
 # thinSample
 user tool to help finding all relevant  [thinBasic](https://www.thinbasic.com) samples scripts given a keyword
 
