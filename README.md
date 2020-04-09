@@ -6,7 +6,7 @@ user tool to help finding all relevant  [thinBasic](https://www.thinbasic.com) s
 ## thinAir integration
 
 1. Copy folder _thinSample_ to _%thinBasic_Installation_Folder%\thinAir\Tools\_
-2. Edit  _%thinBasic_Installation_Folder%\thinAir\Tools\thinAir_Tools.ini_ and append the following section :
+2. Edit  _%thinBasic_Installation_Folder%\thinAir\Tools\thinAir_Tools_Usr.ini_ and append the following section :
 <pre>
 [thinSample]
 Menu=thinSample
